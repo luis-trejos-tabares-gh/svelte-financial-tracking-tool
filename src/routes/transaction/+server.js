@@ -1,4 +1,4 @@
-import { createTransaction, getTransactions } from '$lib/server/database.js';
+import { createTransaction, getFilteredTransactions } from '$lib/server/database.js';
 
 export const POST = async ({ request }) => {
     try {
@@ -11,7 +11,11 @@ export const POST = async ({ request }) => {
     }
 };
 
-export const GET = async () => {
-    const transactions = await getTransactions();
+export const GET = async ({ url }) => {
+    const startDate = url.searchParams.get('startDate') ?? undefined;
+    const endDate   = url.searchParams.get('endDate')   ?? undefined;
+    const search    = url.searchParams.get('search')    ?? undefined;
+
+    const transactions = await getFilteredTransactions({ startDate, endDate, search });
     return new Response(JSON.stringify(transactions), { status: 200 });
 };

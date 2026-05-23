@@ -1,16 +1,20 @@
 <script lang="ts">
-  import { Button, Datepicker, Label, Input, type DateOrRange } from "flowbite-svelte";
-  import CustomTable from '../components/customTable.svelte';
+  import { Button, Label, Input } from "flowbite-svelte";
+  import CustomTable from '../components/CustomTable.svelte';
   import Snackbar from '../components/Snackbar.svelte';
+  import FilterBar from '../components/FilterBar.svelte';
+  import AppDatepicker from '../components/AppDatepicker.svelte';
+  import { budget } from '$lib/budget.svelte.js';
 
   let { data } = $props();
 
+  // ── Form state ────────────────────────────────────────────────
   let title = $state<string | undefined>(undefined);
   let amount = $state<number | undefined>(undefined);
   let selectedDate = $state<Date | undefined>(undefined);
-  let lastAction = $state<string | undefined>(undefined);
   let category = $state<string | undefined>(undefined);
 
+  // ── Snackbar ──────────────────────────────────────────────────
   let snackbarVisible = $state(false);
   let snackbarMessage = $state('');
   let snackbarType = $state<'success' | 'error' | 'info'>('info');
@@ -22,28 +26,56 @@
     setTimeout(() => (snackbarVisible = false), 3500);
   }
 
-  function handleClear() {
-    lastAction = "Cleared";
-  }
+  // ── Filter state ──────────────────────────────────────────────
+  let filteredTransactions = $state<any[]>([]);
+  let isFiltering = $state(false);
 
-  function handleApply(detail: DateOrRange): void {
-    lastAction = "Applied";
-    if (detail instanceof Date) {
-      selectedDate = detail;
+  // Seed filtered list whenever server data changes (e.g. after SSR or navigation)
+  $effect(() => {
+    filteredTransactions = data.transactions ?? [];
+  });
+
+  // Keep budget store in sync with the master transaction list
+  $effect(() => {
+    budget.setSpent(
+      (data.transactions ?? []).reduce((sum: number, t: any) => sum + (Number(t.amount) ?? 0), 0)
+    );
+  });
+
+  async function fetchTransactions(params: Record<string, string> = {}) {
+    isFiltering = true;
+    try {
+      const qs = new URLSearchParams(
+        Object.fromEntries(Object.entries(params).filter(([, v]) => v))
+      ).toString();
+      const res = await fetch(`/transaction${qs ? `?${qs}` : ''}`);
+      if (!res.ok) throw new Error('Failed to fetch');
+      filteredTransactions = await res.json();
+    } catch (e) {
+      showSnackbar('Error al cargar las transacciones.', 'error');
+    } finally {
+      isFiltering = false;
     }
   }
 
+  function handleFilter({ startDate, endDate, search }: { startDate: string; endDate: string; search: string }) {
+    fetchTransactions({ startDate, endDate, search });
+  }
+
+  function handleFilterReset() {
+    filteredTransactions = data.transactions ?? [];
+  }
+
+  // ── Delete ────────────────────────────────────────────────────
   async function handleDelete(id: string) {
     await fetch(`/transaction/${id}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     }).then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to delete transaction");
-      }
+      if (!response.ok) throw new Error("Failed to delete transaction");
+      // Remove from both master list and filtered view
       data = { ...data, transactions: (data.transactions ?? []).filter((t: any) => t.id !== id) };
+      filteredTransactions = filteredTransactions.filter((t: any) => t.id !== id);
       showSnackbar('Transacción eliminada.', 'success');
     }).catch((error) => {
       console.error("Error deleting transaction:", error);
@@ -51,32 +83,27 @@
     });
   }
 
+  // ── Helpers ───────────────────────────────────────────────────
+  /** Returns an ISO-8601 string in local time (YYYY-MM-DDTHH:mm:ss) to avoid UTC date shifting. */
+  function toLocalISOString(d: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+           `T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  // ── Save ──────────────────────────────────────────────────────
   async function handleSave() {
-    // Handle save action
     await fetch("/transaction", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        amount,
-        date: selectedDate?.toISOString(),
-        category,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, amount, date: selectedDate ? toLocalISOString(selectedDate) : undefined, category }),
     }).then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to save transaction");
-      }
+      if (!response.ok) throw new Error("Failed to save transaction");
       return response.json();
     }).then((response) => {
-      // Update the transactions list with the new transaction
-
-      console.log(response.data);
-
-      const transactions = [...(data.transactions ?? []), response.data];
-      console.log(transactions);
-      data = { ...data, transactions };
+      const newTx = response.data;
+      data = { ...data, transactions: [...(data.transactions ?? []), newTx] };
+      filteredTransactions = [...filteredTransactions, newTx];
       title = "";
       amount = undefined;
       selectedDate = undefined;
@@ -87,18 +114,12 @@
       showSnackbar('Error al guardar la transacción.', 'error');
     });
   }
-  
 </script>
 
 <Snackbar bind:visible={snackbarVisible} message={snackbarMessage} type={snackbarType} />
 
-<div class="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-10 px-4">
-  <div class="mx-auto max-w-screen-sm">
-
-    <div class="mb-8 text-center">
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">💸 Hello Expenses</h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Registra tus gastos fácilmente</p>
-    </div>
+<div class="bg-linear-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-10 px-4 min-h-full transition-colors duration-300">
+  <div class="mx-auto">
 
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8 border border-slate-200 dark:border-gray-700">
       <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-5">Nueva Transacción</h2>
@@ -108,8 +129,7 @@
         <Input id="large-input" bind:value={title} size="md" placeholder="ej. Supermercado" />
       </div>
       <div class="mb-4">
-        <Label for="date-picker" class="mb-1 block text-sm font-medium">Fecha</Label>
-        <Datepicker id="date-picker" bind:value={selectedDate} showActionButtons autohide={false} onclear={handleClear} onapply={handleApply} />
+        <AppDatepicker id="date-picker" label="Fecha" bind:value={selectedDate} />
       </div>
       <div class="mb-4">
         <Label for="amount-input" class="mb-1 block text-sm font-medium">Monto</Label>
@@ -129,7 +149,18 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border border-slate-200 dark:border-gray-700">
       <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-4">Historial de Transacciones</h2>
-      <CustomTable data={data.transactions ?? []} ondelete={handleDelete} />
+      <FilterBar onfilter={handleFilter} onreset={handleFilterReset} />
+      {#if isFiltering}
+        <div class="flex items-center justify-center py-10 text-slate-400 dark:text-slate-500 gap-2 text-sm">
+          <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+          </svg>
+          Filtrando...
+        </div>
+      {:else}
+        <CustomTable data={filteredTransactions} ondelete={handleDelete} />
+      {/if}
     </div>
 
   </div>
