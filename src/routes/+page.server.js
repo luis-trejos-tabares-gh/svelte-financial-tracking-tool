@@ -1,18 +1,18 @@
-import { transaction } from '$lib/server/db/schema';
+import { getFilteredTransactions, getCurrencies, getPaymentMethods, seedDefaults } from '$lib/server/database.js';
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ fetch, locals }) {
-    // This code only runs on the server
-    const res = await fetch('/transaction', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }); 
+export async function load() {
+    await seedDefaults();
 
-    const data =  await res.json();
+    const [transactions, currencies, paymentMethods] = await Promise.all([
+        getFilteredTransactions({}),
+        getCurrencies(),
+        getPaymentMethods(),
+    ]);
 
     return {
-        transactions: data
+        transactions,
+        currencies:     currencies.filter(c => c.active),
+        paymentMethods: paymentMethods.filter(p => p.active),
     };
 }

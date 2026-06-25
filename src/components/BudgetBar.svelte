@@ -17,8 +17,8 @@
   );
 </script>
 
-<div class="w-full border-b border-slate-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm px-4 py-2.5">
-  <div class="mx-auto max-w-screen-sm flex items-center gap-3 text-xs">
+<div class="w-full px-4 py-2 border-t border-slate-200 dark:border-gray-700">
+  <div class="flex items-center gap-3 text-xs">
 
     <!-- Left: budget total -->
     <span class="shrink-0 text-slate-500 dark:text-slate-400">
