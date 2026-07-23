@@ -2,9 +2,9 @@
   import { theme } from '$lib/theme.svelte.js';
 
   const options = [
-    { value: 'light', label: 'Light' },
-    { value: 'dark',  label: 'Dark' },
-    { value: 'auto',  label: 'Auto' },
+    { value: 'light', label: 'Light', icon: '☀️' },
+    { value: 'dark',  label: 'Dark',  icon: '🌙' },
+    { value: 'auto',  label: 'Auto',  icon: '💻' },
   ];
 </script>
 

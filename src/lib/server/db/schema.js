@@ -1,5 +1,11 @@
 import { integer, sqliteTable, text, real } from 'drizzle-orm/sqlite-core';
 
+export const category = sqliteTable('category', {
+	id:     text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	name:   text('name').notNull().unique(),
+	active: integer('active', { mode: 'boolean' }).notNull().default(true),
+});
+
 export const transaction = sqliteTable('transaction', {
 	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
 	title: text('title').notNull(),

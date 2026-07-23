@@ -1,6 +1,6 @@
-import { transaction as TransactionTable, currency as CurrencyTable, paymentMethod as PaymentMethodTable, budget as BudgetTable } from './db/schema.js';
+import { transaction as TransactionTable, currency as CurrencyTable, paymentMethod as PaymentMethodTable, budget as BudgetTable, category as CategoryTable } from './db/schema.js';
 import { db } from './db/index.js';
-import { eq, and, gte, lte, or, like, lt, gt } from 'drizzle-orm';
+import { eq, and, gte, lte, or, like, ne } from 'drizzle-orm';
 
 // ── Seed helpers ──────────────────────────────────────────────────────────────
 const DEFAULT_CURRENCIES = [
@@ -16,6 +16,19 @@ const DEFAULT_PAYMENT_METHODS = [
 	{ code: 'efectivo',        name: 'Efectivo',               icon: '💵' },
 ];
 
+const DEFAULT_CATEGORIES = [
+	{ name: 'Hogar'            },
+	{ name: 'Vacaciones'       },
+	{ name: 'Comida'           },
+	{ name: 'Transporte'       },
+	{ name: 'Salud'            },
+	{ name: 'Entretenimiento'  },
+	{ name: 'Educación'        },
+	{ name: 'Ropa'             },
+	{ name: 'Servicios'        },
+	{ name: 'Otros'            },
+];
+
 export const seedDefaults = async () => {
 	for (const c of DEFAULT_CURRENCIES) {
 		const exists = await db.select().from(CurrencyTable).where(eq(CurrencyTable.code, c.code)).get();
@@ -24,6 +37,10 @@ export const seedDefaults = async () => {
 	for (const p of DEFAULT_PAYMENT_METHODS) {
 		const exists = await db.select().from(PaymentMethodTable).where(eq(PaymentMethodTable.code, p.code)).get();
 		if (!exists) await db.insert(PaymentMethodTable).values(p);
+	}
+	for (const cat of DEFAULT_CATEGORIES) {
+		const exists = await db.select().from(CategoryTable).where(eq(CategoryTable.name, cat.name)).get();
+		if (!exists) await db.insert(CategoryTable).values(cat);
 	}
 };
 
@@ -38,6 +55,12 @@ export const getPaymentMethods   = async () => db.select().from(PaymentMethodTab
 export const createPaymentMethod = async (data) => (await db.insert(PaymentMethodTable).values(data).returning())[0];
 export const updatePaymentMethod = async (id, data) => (await db.update(PaymentMethodTable).set(data).where(eq(PaymentMethodTable.id, id)).returning())[0];
 export const deletePaymentMethod = async (id) => db.delete(PaymentMethodTable).where(eq(PaymentMethodTable.id, id));
+
+// ── Categories ────────────────────────────────────────────────────────────────
+export const getCategories    = async () => db.select().from(CategoryTable).orderBy(CategoryTable.name).all();
+export const createCategory   = async (data) => (await db.insert(CategoryTable).values(data).returning())[0];
+export const updateCategory   = async (id, data) => (await db.update(CategoryTable).set(data).where(eq(CategoryTable.id, id)).returning())[0];
+export const deleteCategory   = async (id) => db.delete(CategoryTable).where(eq(CategoryTable.id, id));
 
 // ── Transactions ──────────────────────────────────────────────────────────────
 
@@ -100,11 +123,11 @@ const getFilteredTransactions = async ({ startDate, endDate, search } = {}) => {
 
 const getTransactionById = async (id) => {
     try {
-        const transaction = await db.select().from(TransactionTable).where({ id }).first();
+        const transaction = await db.select().from(TransactionTable).where(eq(TransactionTable.id, id)).get();
         return transaction || null;
     } catch (error) {
-        console.error('Error fetching transactions:', error);
-        return [];
+        console.error('Error fetching transaction by id:', error);
+        return null;
     }
 };
 
@@ -126,11 +149,10 @@ export const findOverlappingBudget = async ({ currency, startDate, endDate, excl
         lte(BudgetTable.startDate, endDate),   // existing.start <= newEnd
         gte(BudgetTable.endDate,   startDate), // existing.end   >= newStart
     ];
-    if (excludeId) conditions.push(gt(BudgetTable.id, ''));  // placeholder replaced below
+    if (excludeId) conditions.push(ne(BudgetTable.id, excludeId));
 
     const rows = await db.select().from(BudgetTable).where(and(...conditions)).all();
-    if (!excludeId) return rows[0] ?? null;
-    return rows.find(r => r.id !== excludeId) ?? null;
+    return rows[0] ?? null;
 };
 
 export const getBudgets        = async () => db.select().from(BudgetTable).orderBy(BudgetTable.startDate).all();

@@ -4,8 +4,8 @@
   import Snackbar from '../components/Snackbar.svelte';
   import FilterBar from '../components/FilterBar.svelte';
   import AppDatepicker from '../components/AppDatepicker.svelte';
+  import BudgetBar from '../components/BudgetBar.svelte';
   import { budget } from '$lib/budget.svelte.js';
-	import BudgetBar from "../components/BudgetBar.svelte";
 
   let { data } = $props();
 
@@ -21,6 +21,13 @@
   $effect(() => {
     if (!paymentMethod && data.paymentMethods?.length) {
       paymentMethod = data.paymentMethods[0].code;
+    }
+  });
+
+  // Seed category default once options load
+  $effect(() => {
+    if (!category && data.categories?.length) {
+      category = data.categories[0].name;
     }
   });
 
@@ -43,13 +50,6 @@
   // Seed filtered list whenever server data changes (e.g. after SSR or navigation)
   $effect(() => {
     filteredTransactions = data.transactions ?? [];
-  });
-
-  // Keep budget store in sync with the master transaction list
-  $effect(() => {
-    budget.setSpent(
-      (data.transactions ?? []).reduce((sum: number, t: any) => sum + (Number(t.amount) ?? 0), 0)
-    );
   });
 
   async function fetchTransactions(params: Record<string, string> = {}) {
@@ -87,6 +87,7 @@
       data = { ...data, transactions: (data.transactions ?? []).filter((t: any) => t.id !== id) };
       filteredTransactions = filteredTransactions.filter((t: any) => t.id !== id);
       showSnackbar('Transacción eliminada.', 'success');
+      budget.load();
     }).catch((error) => {
       console.error("Error deleting transaction:", error);
       showSnackbar('Error al eliminar la transacción.', 'error');
@@ -123,7 +124,9 @@
       category = undefined;
       currency = 'CRC';
       paymentMethod = data.paymentMethods?.[0]?.code ?? '';
+      category = data.categories?.[0]?.name ?? undefined;
       showSnackbar('¡Transacción guardada!', 'success');
+      budget.load();
     }).catch((error) => {
       console.error("Error saving transaction:", error);
       showSnackbar('Error al guardar la transacción.', 'error');
@@ -135,10 +138,9 @@
 
 <div class="bg-linear-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-10 px-4 min-h-full transition-colors duration-300">
   <div class="mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8 border border-slate-200 dark:border-gray-700">
-        <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-5">Presupuesto Actual</h2>
-        <BudgetBar />
-    </div>
+
+    <BudgetBar />
+
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8 border border-slate-200 dark:border-gray-700">
       <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-5">Nueva Transacción</h2>
 
@@ -168,8 +170,13 @@
       </div>
 
       <div class="mb-4">
-        <Label for="category-input" class="mb-1 block text-sm font-medium">Categoría</Label>
-        <Input id="category-input" type="text" bind:value={category} size="md" placeholder="ej. Comida, Transporte..." />
+        <Label for="category-select" class="mb-1 block text-sm font-medium">Categoría</Label>
+        <Select
+          id="category-select"
+          bind:value={category}
+          size="md"
+          items={data.categories?.map((c: any) => ({ value: c.name, name: c.name })) ?? []}
+        />
       </div>
 
       <div class="mb-6">

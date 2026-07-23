@@ -1,15 +1,34 @@
-/** Hardcoded global budget in colones */
-export const BUDGET = 500_000;
-
+/**
+ * Budget store.
+ * Fetches all budgets from /budget and exposes only those active on today's date.
+ * Call budget.load() to refresh (e.g. after a transaction is added/removed).
+ */
 function createBudgetStore() {
-  let totalSpent = $state(0);
+  /** @type {{ id:string, label:string, amount:number, spent:number, currency:string, startDate:string, endDate:string, active:boolean }[]} */
+  let all     = $state([]);
+  let loading = $state(false);
+
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+  /** Budgets whose date range covers today and are marked active */
+  const open = $derived(
+    all.filter(b => b.active && b.startDate <= today && b.endDate >= today)
+  );
+
+  async function load() {
+    if (typeof fetch === 'undefined') return;
+    loading = true;
+    try {
+      const res = await fetch('/budget');
+      if (res.ok) all = await res.json();
+    } catch { /* silently ignore network errors */ }
+    finally { loading = false; }
+  }
 
   return {
-    get totalSpent() { return totalSpent; },
-    setSpent(v) { totalSpent = v; },
-    get remaining() { return BUDGET - totalSpent; },
-    get percent() { return Math.min((totalSpent / BUDGET) * 100, 100); },
-    get isOverBudget() { return totalSpent > BUDGET; },
+    get open()    { return open;    },
+    get loading() { return loading; },
+    load,
   };
 }
 

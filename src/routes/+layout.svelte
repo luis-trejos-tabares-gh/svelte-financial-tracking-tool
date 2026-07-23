@@ -2,19 +2,24 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import ThemeToggle from '../components/ThemeToggle.svelte';
-	import BudgetBar from '../components/BudgetBar.svelte';
 	import { theme } from '$lib/theme.svelte.js';
+	import { budget } from '$lib/budget.svelte.js';
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
+	import { afterNavigate } from '$app/navigation';
 
 	let { children } = $props();
 
-	onMount(() => theme.init());
+	onMount(() => { theme.init(); budget.load(); });
 	onDestroy(() => theme.destroy());
+
+	// Refresh budget spend numbers whenever the user navigates
+	afterNavigate(() => budget.load());
 
 	const navItems = [
 		{ href: '/',                 icon: '💸', label: 'Gastos'           },
 		{ href: '/budgets',          icon: '🎯', label: 'Presupuestos'     },
+		{ href: '/categories',       icon: '🏷️', label: 'Categorías'      },
 		{ href: '/currencies',       icon: '💱', label: 'Monedas'          },
 		{ href: '/payment-methods',  icon: '💳', label: 'Métodos de Pago' },
 	];
