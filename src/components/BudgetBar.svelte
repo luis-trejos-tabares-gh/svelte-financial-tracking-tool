@@ -1,10 +1,7 @@
 <script>
   import { budget } from '$lib/budget.svelte.js';
-
-  function fmt(amount, currency) {
-    if (currency === 'USD') return `$${Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    return `₡${Math.abs(amount).toLocaleString('es-CR')}`;
-  }
+  import { _ } from 'svelte-i18n';
+  import { fmtAmount } from '$lib/i18n';
 
   function pct(spent, amount) {
     return Math.min((spent / amount) * 100, 100);
@@ -27,10 +24,10 @@
 
 <div class="w-full border-t border-slate-200 dark:border-gray-700 px-4 py-2 text-xs">
   {#if budget.loading}
-    <div class="text-slate-400 dark:text-slate-500">Cargando presupuesto…</div>
+    <div class="text-slate-400 dark:text-slate-500">{$_('budgetBar.loading')}</div>
 
   {:else if budget.open.length === 0}
-    <div class="text-slate-400 dark:text-slate-500 italic">Sin presupuesto activo para hoy.</div>
+    <div class="text-slate-400 dark:text-slate-500 italic">{$_('budgetBar.noActive')}</div>
 
   {:else}
     <div class="flex flex-col gap-1.5">
@@ -38,12 +35,10 @@
         {@const p = pct(b.spent, b.amount)}
         {@const remaining = b.amount - b.spent}
         <div class="flex items-center gap-3">
-          <!-- Label -->
           <span class="shrink-0 w-28 truncate font-medium text-slate-600 dark:text-slate-300" title={b.label}>
             {b.label}
           </span>
 
-          <!-- Bar -->
           <div class="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-gray-700 overflow-hidden">
             <div
               class="h-full rounded-full transition-all duration-500 {barColor(p)}"
@@ -51,15 +46,14 @@
             ></div>
           </div>
 
-          <!-- Spent / remaining -->
           <span class="shrink-0 text-slate-400 dark:text-slate-500 whitespace-nowrap">
-            {fmt(b.spent, b.currency)} gastado
+            {fmtAmount(b.spent, b.currency)} {$_('budgetBar.spent')}
             &nbsp;·&nbsp;
             <span class={remainingColor(b.spent, b.amount)}>
               {#if remaining < 0}
-                {fmt(Math.abs(remaining), b.currency)} sobre límite
+                {fmtAmount(Math.abs(remaining), b.currency)} {$_('budgetBar.overLimit')}
               {:else}
-                {fmt(remaining, b.currency)} disponible
+                {fmtAmount(remaining, b.currency)} {$_('budgetBar.available')}
               {/if}
             </span>
           </span>

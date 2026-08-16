@@ -1,10 +1,12 @@
 <script>
   import { theme } from '$lib/theme.svelte.js';
+  import { SunOutline, MoonOutline, DesktopPcOutline } from 'flowbite-svelte-icons';
+  import { _ } from 'svelte-i18n';
 
   const options = [
-    { value: 'light', label: 'Light', icon: '☀️' },
-    { value: 'dark',  label: 'Dark',  icon: '🌙' },
-    { value: 'auto',  label: 'Auto',  icon: '💻' },
+    { value: 'light', labelKey: 'theme.light', icon: SunOutline       },
+    { value: 'dark',  labelKey: 'theme.dark',  icon: MoonOutline      },
+    { value: 'auto',  labelKey: 'theme.auto',  icon: DesktopPcOutline },
   ];
 </script>
 
@@ -12,15 +14,15 @@
   {#each options as opt}
     <button
       onclick={() => theme.set(opt.value)}
-      aria-label={opt.label}
-      title={opt.label}
+      aria-label={$_(opt.labelKey)}
+      title={$_(opt.labelKey)}
       class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
         {theme.mode === opt.value
           ? 'bg-white dark:bg-gray-900 text-slate-800 dark:text-white shadow'
           : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}"
     >
-      <span>{opt.icon}</span>
-      <span class="hidden sm:inline">{opt.label}</span>
+      <svelte:component this={opt.icon} class="w-3.5 h-3.5 shrink-0" />
+      <span class="hidden sm:inline">{$_(opt.labelKey)}</span>
     </button>
   {/each}
 </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button, Input, Label, Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Toggle } from 'flowbite-svelte';
   import Snackbar from './Snackbar.svelte';
+  import { _ } from 'svelte-i18n';
 
   interface Column {
     key: string;
@@ -12,12 +13,12 @@
 
   interface Props {
     title:       string;
-    apiPath:     string;   // e.g. '/currency'
+    apiPath:     string;
     columns:     Column[];
     addLabel?:   string;
   }
 
-  let { title, apiPath, columns, addLabel = 'Agregar' }: Props = $props();
+  let { title, apiPath, columns, addLabel }: Props = $props();
 
   let rows        = $state<any[]>([]);
   let editingId   = $state<string | null>(null);
@@ -40,7 +41,7 @@
     try {
       const res = await fetch(apiPath);
       rows = await res.json();
-    } catch { toast('Error al cargar los datos.', 'error'); }
+    } catch { toast($_('common.errorLoad'), 'error'); }
     finally { loading = false; }
   }
 
@@ -52,13 +53,13 @@
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      toast(err.message ?? 'Error al crear el registro.', 'error');
+      toast(err.message ?? $_('common.errorCreate'), 'error');
       return;
     }
     const created = await res.json();
     rows = [...rows, created];
     addValues = {};
-    toast('Registro creado.', 'success');
+    toast($_('common.recordCreated'), 'success');
   }
 
   function startEdit(row: any) {
@@ -72,22 +73,21 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editValues),
     });
-    if (!res.ok) { toast('Error al guardar.', 'error'); return; }
+    if (!res.ok) { toast($_('common.errorSave'), 'error'); return; }
     const updated = await res.json();
     rows = rows.map(r => r.id === editingId ? updated : r);
     editingId = null;
-    toast('Cambios guardados.', 'success');
+    toast($_('common.changesSaved'), 'success');
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Eliminar este registro?')) return;
+    if (!confirm($_('common.confirmDelete'))) return;
     const res = await fetch(`${apiPath}/${id}`, { method: 'DELETE' });
-    if (!res.ok) { toast('Error al eliminar.', 'error'); return; }
+    if (!res.ok) { toast($_('common.errorDelete'), 'error'); return; }
     rows = rows.filter(r => r.id !== id);
-    toast('Registro eliminado.', 'success');
+    toast($_('common.recordDeleted'), 'success');
   }
 
-  // Initial load
   $effect(() => { load(); });
 </script>
 
@@ -100,7 +100,7 @@
 
   <!-- Add row form -->
   <div class="px-6 py-4 bg-slate-50 dark:bg-gray-900/40 border-b border-slate-200 dark:border-gray-700">
-    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-3">Nuevo registro</p>
+    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-3">{$_('common.newRecord')}</p>
     <div class="flex flex-wrap items-end gap-3">
       {#each columns.filter(c => c.editable !== false && c.type !== 'toggle') as col}
         <div class="flex flex-col gap-1 min-w-32">
@@ -115,7 +115,7 @@
       {/each}
       <Button size="sm" color="green" onclick={handleAdd}
         disabled={columns.filter(c => c.editable !== false && c.type !== 'toggle').some(c => !addValues[c.key])}>
-        {addLabel}
+        {addLabel ?? $_('common.add')}
       </Button>
     </div>
   </div>
@@ -126,19 +126,19 @@
       {#each columns as col}
         <TableHeadCell class="px-4 py-3">{col.label}</TableHeadCell>
       {/each}
-      <TableHeadCell class="px-4 py-3">Acciones</TableHeadCell>
+      <TableHeadCell class="px-4 py-3">{$_('common.actions')}</TableHeadCell>
     </TableHead>
     <TableBody>
       {#if loading}
         <TableBodyRow>
           <TableBodyCell colspan={columns.length + 1} class="text-center py-10 text-slate-400 italic text-sm">
-            Cargando…
+            {$_('common.loading')}
           </TableBodyCell>
         </TableBodyRow>
       {:else if rows.length === 0}
         <TableBodyRow>
           <TableBodyCell colspan={columns.length + 1} class="text-center py-10 text-slate-400 italic text-sm">
-            Sin registros.
+            {$_('common.noRecords')}
           </TableBodyCell>
         </TableBodyRow>
       {:else}
@@ -154,7 +154,7 @@
                   {/if}
                 {:else if col.type === 'toggle'}
                   <span class="inline-flex items-center gap-1 text-xs font-medium {row[col.key] ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}">
-                    {row[col.key] ? '✓ Activo' : '✗ Inactivo'}
+                    {row[col.key] ? $_('common.active') : $_('common.inactive')}
                   </span>
                 {:else}
                   <span class="text-slate-700 dark:text-slate-200 text-sm">{row[col.key] ?? '—'}</span>
@@ -164,11 +164,11 @@
             <TableBodyCell class="px-4 py-3">
               <div class="flex items-center gap-2">
                 {#if editingId === row.id}
-                  <Button size="xs" color="green" onclick={handleSave}>Guardar</Button>
-                  <Button size="xs" color="light" onclick={() => editingId = null}>Cancelar</Button>
+                  <Button size="xs" color="green" onclick={handleSave}>{$_('common.save')}</Button>
+                  <Button size="xs" color="light" onclick={() => editingId = null}>{$_('common.cancel')}</Button>
                 {:else}
-                  <Button size="xs" color="blue" outline onclick={() => startEdit(row)}>Editar</Button>
-                  <Button size="xs" color="red"  outline onclick={() => handleDelete(row.id)}>Eliminar</Button>
+                  <Button size="xs" color="blue" outline onclick={() => startEdit(row)}>{$_('common.edit')}</Button>
+                  <Button size="xs" color="red"  outline onclick={() => handleDelete(row.id)}>{$_('common.delete')}</Button>
                 {/if}
               </div>
             </TableBodyCell>

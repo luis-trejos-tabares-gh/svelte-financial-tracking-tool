@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Label, Input, Button } from 'flowbite-svelte';
   import AppDatepicker from './AppDatepicker.svelte';
+  import { _ } from 'svelte-i18n';
 
   interface Filters {
     startDate: string;
@@ -17,11 +18,8 @@
   let endDate   = $state<Date | undefined>(undefined);
   let search    = $state('');
 
-  // Validation errors
   let errors = $state<{ startDate?: string; endDate?: string }>({});
 
-  /** Serialize a Date to a local ISO string for the API.
-   *  Produces YYYY-MM-DDTHH:mm:ss (no UTC shift). */
   function toLocalISO(d: Date): string {
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
@@ -30,14 +28,12 @@
 
   function validate(): boolean {
     const e: { startDate?: string; endDate?: string } = {};
-
     if (startDate && endDate && endDate < startDate) {
-      e.endDate = 'La fecha de fin no puede ser anterior a la de inicio.';
+      e.endDate = $_('filter.errorEndBeforeStart');
     }
     if (endDate && !startDate) {
-      e.startDate = 'Ingresa una fecha de inicio.';
+      e.startDate = $_('filter.errorStartRequired');
     }
-
     errors = e;
     return Object.keys(e).length === 0;
   }
@@ -68,20 +64,19 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
     </svg>
-    Filtrar transacciones
+    {$_('filter.title')}
     {#if hasActiveFilter}
       <span class="ml-auto inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">
-        Activo
+        {$_('filter.active')}
       </span>
     {/if}
   </h2>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <!-- Start date -->
     <div>
       <AppDatepicker
         id="filter-start"
-        label="Desde"
+        label={$_('filter.from')}
         bind:value={startDate}
         maxDate={endDate}
         showTime
@@ -91,11 +86,10 @@
       {/if}
     </div>
 
-    <!-- End date -->
     <div>
       <AppDatepicker
         id="filter-end"
-        label="Hasta"
+        label={$_('filter.to')}
         bind:value={endDate}
         minDate={startDate}
         showTime
@@ -105,14 +99,13 @@
       {/if}
     </div>
 
-    <!-- Text search spanning both columns -->
     <div class="sm:col-span-2">
-      <Label for="filter-search" class="mb-1 block text-xs font-medium">Título o categoría</Label>
+      <Label for="filter-search" class="mb-1 block text-xs font-medium">{$_('filter.search')}</Label>
       <Input
         id="filter-search"
         type="text"
         bind:value={search}
-        placeholder="Buscar por título o categoría..."
+        placeholder={$_('transactions.placeholderSearch')}
         size="sm"
       />
     </div>
@@ -121,11 +114,11 @@
   <div class="mt-4 flex justify-end gap-2">
     {#if hasActiveFilter}
       <Button size="xs" color="light" onclick={handleReset}>
-        Limpiar
+        {$_('filter.clear')}
       </Button>
     {/if}
     <Button size="xs" color="blue" onclick={handleApply}>
-      Aplicar filtro
+      {$_('filter.apply')}
     </Button>
   </div>
 </div>

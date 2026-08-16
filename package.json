@@ -36,5 +36,9 @@
 		"svelte": "^5.55.2",
 		"tailwindcss": "^4.2.2",
 		"vite": "^8.0.7"
+	},
+	"dependencies": {
+		"svelte-clerk": "^1.1.13",
+		"svelte-i18n": "^4.0.1"
 	}
 }

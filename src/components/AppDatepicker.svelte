@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Datepicker, Label, type DateOrRange } from 'flowbite-svelte';
+  import { _ } from 'svelte-i18n';
 
   interface Props {
     /** Bound date value */
@@ -21,14 +22,15 @@
     value = $bindable(undefined),
     label = '',
     id = crypto.randomUUID(),
-    placeholder = 'Selecciona una fecha',
+    placeholder = '',
     minDate = undefined,
     maxDate = undefined,
     showTime = false,
     class: extraClass = '',
   }: Props = $props();
 
-  // ── Time state (12-hour) ──────────────────────────────────────
+  const resolvedPlaceholder = $derived(placeholder || $_('datepicker.placeholder'));
+
   const HOURS   = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // 01–12
   const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));      // 00–59
 
@@ -82,7 +84,7 @@
       <Datepicker
         {id}
         bind:value
-        {placeholder}
+        placeholder={resolvedPlaceholder}
         availableFrom={minDate}
         availableTo={maxDate}
         showActionButtons
