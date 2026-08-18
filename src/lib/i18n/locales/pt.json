@@ -29,7 +29,29 @@
     "errorDelete": "Erro ao excluir registro.",
     "recordCreated": "Registro criado.",
     "changesSaved": "Alterações salvas.",
-    "recordDeleted": "Registro excluído."
+    "recordDeleted": "Registro excluído.",
+    "appName": "expenseur"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signUp": "Criar conta"
+  },
+  "workspace": {
+    "switcherLabel": "Espaço de trabalho",
+    "new": "Novo espaço",
+    "namePlaceholder": "Nome do espaço",
+    "create": "Criar espaço",
+    "creating": "Criando...",
+    "errorCreate": "Não foi possível criar o espaço."
+  },
+  "invite": {
+    "title": "Convite",
+    "joined": "Você entrou em {name}.",
+    "redirecting": "Redirecionando…",
+    "alreadyAccepted": "Este convite já foi aceito.",
+    "expired": "Este convite expirou.",
+    "invalid": "Este convite é inválido.",
+    "goHome": "Ir para gastos"
   },
   "transactions": {
     "title": "Gastos",
@@ -108,7 +130,8 @@
     "validationStartDate": "Insira uma data de início.",
     "validationEndDate": "A data de término não pode ser anterior à data de início.",
     "editLabel": "Rótulo",
-    "editLimit": "Valor limite"
+    "editLimit": "Valor limite",
+    "placeholderLabel": "ex. Casa"
   },
   "budgetBar": {
     "loading": "Carregando orçamento...",
@@ -148,22 +171,23 @@
   },
   "settings": {
     "title": "Configurações",
-    "subtitle": "Gerencie seu perfil, grupo e preferências.",
+    "subtitle": "Gerencie seu perfil, espaço de trabalho e preferências.",
     "profileSection": "Perfil",
     "noName": "Sem nome",
     "editProfile": "Editar perfil",
-    "groupSection": "Grupo",
+    "workspaceSection": "Espaço de trabalho",
     "memberDefault": "Membro",
-    "roleAdmin": "Admin",
-    "roleMember": "Membro",
+    "owner": "Proprietário",
+    "member": "Membro",
     "inviteTitle": "Convidar membro",
     "invitePlaceholder": "email@exemplo.com",
     "inviteBtn": "Convidar",
     "inviteSending": "Enviando...",
-    "leaveGroup": "Sair do grupo",
-    "leavingGroup": "Saindo...",
-    "leaveConfirm": "Tem certeza que deseja sair do grupo? Você perderá acesso a todos os dados compartilhados.",
-    "leaveError": "Erro ao sair do grupo.",
+    "leaveWorkspace": "Sair do espaço",
+    "leavingWorkspace": "Saindo...",
+    "leaveConfirm": "Sair deste espaço? Você perderá acesso aos dados compartilhados.",
+    "leaveError": "Erro ao sair do espaço.",
+    "cannotLeave": "Você não pode sair do seu único espaço.",
     "dangerZone": "Zona de perigo",
     "deleteAccountDescPrefix": "Excluir sua conta é permanente e irreversível. Digite",
     "deletePhrase": "excluir minha conta",

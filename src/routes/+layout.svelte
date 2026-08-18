@@ -3,7 +3,10 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import ThemeToggle from '../components/ThemeToggle.svelte';
 	import LanguageSwitcher from '../components/LanguageSwitcher.svelte';
-	import { ClerkProvider, UserButton, OrganizationSwitcher } from 'svelte-clerk';
+	import WorkspaceSwitcher from '../components/WorkspaceSwitcher.svelte';
+	import { ClerkProvider, UserButton } from 'svelte-clerk';
+	import { dark } from '@clerk/themes';
+	import { enUS, esES, ptBR, deDE } from '@clerk/localizations';
 	import {
 		ReceiptOutline, WalletOutline, TagOutline,
 		DollarOutline, CreditCardOutline, CogOutline
@@ -11,13 +14,15 @@
 	import { theme } from '$lib/theme.svelte.js';
 	import { budget } from '$lib/budget.svelte.js';
 	import { setupI18n } from '$lib/i18n';
-	import { _ } from 'svelte-i18n';
-	import { isLoading } from 'svelte-i18n';
+	import { _, isLoading, locale } from 'svelte-i18n';
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	let { children, data } = $props();
+
+	const clerkProps = $derived({ initialState: data.initialState });
 
 	setupI18n();
 
@@ -25,6 +30,18 @@
 	onDestroy(() => theme.destroy());
 
 	afterNavigate(() => budget.load());
+
+	const CLERK_LOCALES = { en: enUS, es: esES, pt: ptBR, de: deDE };
+
+	const clerkLocalization = $derived(CLERK_LOCALES[$locale] ?? enUS);
+	const clerkAppearance = $derived({
+		baseTheme: theme.isDark ? dark : undefined,
+		variables: { colorPrimary: '#2563eb' },
+	});
+
+	$effect(() => {
+		if (browser && $locale) document.documentElement.lang = $locale;
+	});
 
 	const navItems = [
 		{ href: '/',                icon: ReceiptOutline,    labelKey: 'nav.expenses'      },
@@ -40,19 +57,36 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-<ClerkProvider {...data}>
+{#key `${theme.mode}-${$locale}`}
+<ClerkProvider {...clerkProps} appearance={clerkAppearance} localization={clerkLocalization}>
 {#if $isLoading}
   <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900">
     <div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
   </div>
+{:else if !data.signedIn}
+	<div class="min-h-screen flex flex-col bg-slate-50 dark:bg-gray-900">
+		<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-gray-700
+		               bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+			<div class="flex items-center gap-3 px-4 py-3">
+				<span class="text-sm font-bold text-slate-700 dark:text-slate-200 tracking-tight flex-1">
+					{$_('common.appName')}
+				</span>
+				<div class="flex items-center gap-2">
+					<LanguageSwitcher />
+					<ThemeToggle />
+				</div>
+			</div>
+		</header>
+		<main class="flex-1">
+			{@render children()}
+		</main>
+	</div>
 {:else}
 <div class="min-h-screen flex flex-col bg-slate-50 dark:bg-gray-900 transition-colors duration-300">
 
-	<!-- ── Top bar ───────────────────────────────────────────────── -->
 	<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-gray-700
 	               bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
 		<div class="flex items-center gap-3 px-4 py-3">
-			<!-- Hamburger (mobile) -->
 			<button
 				class="lg:hidden p-1.5 rounded-lg text-slate-500 dark:text-slate-400
 				       hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors"
@@ -66,7 +100,7 @@
 			</button>
 
 			<span class="text-sm font-bold text-slate-700 dark:text-slate-200 tracking-tight flex-1">
-				Hello Expenses
+				{$_('common.appName')}
 			</span>
 
 			<div class="flex items-center gap-2">
@@ -79,7 +113,6 @@
 
 	<div class="flex flex-1 overflow-hidden">
 
-		<!-- ── Sidebar ───────────────────────────────────────────── -->
 		{#if sidebarOpen}
 			<div
 				class="fixed inset-0 z-30 bg-black/40 lg:hidden"
@@ -97,12 +130,10 @@
 			lg:static lg:translate-x-0 lg:top-0
 			{sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
 		">
-			<!-- Org switcher -->
-			<div class="px-3 pt-4 pb-2 border-b border-slate-100 dark:border-gray-800">
-				<OrganizationSwitcher
-					hidePersonal={true}
-					afterSelectOrganizationUrl="/"
-					afterCreateOrganizationUrl="/"
+			<div class="px-2 pt-3 pb-2 border-b border-slate-100 dark:border-gray-800">
+				<WorkspaceSwitcher
+					workspaces={data.workspaces}
+					activeWorkspaceId={data.activeWorkspaceId}
 				/>
 			</div>
 
@@ -131,7 +162,6 @@
 			</div>
 		</aside>
 
-		<!-- ── Main content ──────────────────────────────────────── -->
 		<main class="flex-1 overflow-y-auto">
 			{@render children()}
 		</main>
@@ -139,3 +169,4 @@
 </div>
 {/if}
 </ClerkProvider>
+{/key}

@@ -181,6 +181,8 @@
   }
 </script>
 
+<svelte:head><title>{$_('transactions.title')} · {$_('common.appName')}</title></svelte:head>
+
 <Snackbar bind:visible={snackbarVisible} message={snackbarMessage} type={snackbarType} />
 
 <div class="bg-linear-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-10 px-4 min-h-full transition-colors duration-300">

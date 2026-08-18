@@ -1,4 +1,4 @@
-import { transaction as TransactionTable, currency as CurrencyTable, paymentMethod as PaymentMethodTable, budget as BudgetTable, category as CategoryTable } from './db/schema.js';
+import { transaction as TransactionTable, currency as CurrencyTable, paymentMethod as PaymentMethodTable, budget as BudgetTable, category as CategoryTable, workspace as WorkspaceTable, workspaceMember as WorkspaceMemberTable, workspaceInvite as WorkspaceInviteTable } from './db/schema.js';
 import { db } from './db/index.js';
 import { eq, and, gte, lte, or, like, ne } from 'drizzle-orm';
 
@@ -177,4 +177,68 @@ export const getBudgetSpend = async (budget) => {
 		const val = Number(r.amount) ?? 0;
 		return r.type === 'income' ? sum - val : sum + val;
 	}, 0);
+};
+
+// ── Workspaces ────────────────────────────────────────────────────────────────
+
+export const createWorkspace = async (data) =>
+	(await db.insert(WorkspaceTable).values(data).returning())[0];
+
+export const getWorkspaceById = async (id) =>
+	db.select().from(WorkspaceTable).where(eq(WorkspaceTable.id, id)).get();
+
+export const getWorkspacesForUser = async (userId) => {
+	const rows = await db.select({
+		id:        WorkspaceTable.id,
+		name:      WorkspaceTable.name,
+		ownerId:   WorkspaceTable.ownerId,
+		createdAt: WorkspaceTable.createdAt,
+	}).from(WorkspaceMemberTable)
+		.innerJoin(WorkspaceTable, eq(WorkspaceMemberTable.workspaceId, WorkspaceTable.id))
+		.where(eq(WorkspaceMemberTable.userId, userId))
+		.all();
+	return rows;
+};
+
+export const addWorkspaceMember = async ({ workspaceId, userId }) =>
+	(await db.insert(WorkspaceMemberTable).values({ workspaceId, userId }).returning())[0];
+
+export const getWorkspaceMembers = async (workspaceId) =>
+	db.select().from(WorkspaceMemberTable).where(eq(WorkspaceMemberTable.workspaceId, workspaceId)).all();
+
+export const isWorkspaceMember = async (workspaceId, userId) => {
+	const row = await db.select().from(WorkspaceMemberTable)
+		.where(and(eq(WorkspaceMemberTable.workspaceId, workspaceId), eq(WorkspaceMemberTable.userId, userId)))
+		.get();
+	return !!row;
+};
+
+export const removeWorkspaceMember = async (workspaceId, userId) =>
+	db.delete(WorkspaceMemberTable)
+		.where(and(eq(WorkspaceMemberTable.workspaceId, workspaceId), eq(WorkspaceMemberTable.userId, userId)));
+
+export const deleteWorkspaceMembers = async (workspaceId) =>
+	db.delete(WorkspaceMemberTable).where(eq(WorkspaceMemberTable.workspaceId, workspaceId));
+
+export const createWorkspaceInvite = async (data) =>
+	(await db.insert(WorkspaceInviteTable).values(data).returning())[0];
+
+export const getInviteByToken = async (token) =>
+	db.select().from(WorkspaceInviteTable).where(eq(WorkspaceInviteTable.token, token)).get();
+
+export const markInviteAccepted = async (id) =>
+	(await db.update(WorkspaceInviteTable)
+		.set({ acceptedAt: new Date().toISOString() })
+		.where(eq(WorkspaceInviteTable.id, id))
+		.returning())[0];
+
+/** Collect distinct group_id values already stored in financial tables. */
+export const getLegacyGroupIds = async () => {
+	const tables = [TransactionTable, BudgetTable, CategoryTable, CurrencyTable, PaymentMethodTable];
+	const ids = new Set();
+	for (const table of tables) {
+		const rows = await db.select({ groupId: table.groupId }).from(table).all();
+		for (const r of rows) if (r.groupId) ids.add(r.groupId);
+	}
+	return [...ids];
 };

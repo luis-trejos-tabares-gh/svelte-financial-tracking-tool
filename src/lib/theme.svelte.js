@@ -24,6 +24,7 @@ function createTheme() {
       systemQuery ? systemQuery.matches : window.matchMedia('(prefers-color-scheme: dark)').matches;
     const isDark = mode === 'dark' || (mode === 'auto' && prefersDark);
     document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
   }
 
   function handleSystemChange() {
@@ -54,6 +55,12 @@ function createTheme() {
 
   return {
     get mode() { return mode; },
+    get isDark() {
+      if (mode === 'dark') return true;
+      if (mode === 'light') return false;
+      if (typeof window === 'undefined') return false;
+      return (systemQuery ?? window.matchMedia('(prefers-color-scheme: dark)')).matches;
+    },
     set,
     init,
     destroy,

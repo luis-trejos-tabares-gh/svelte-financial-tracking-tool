@@ -29,7 +29,29 @@
     "errorDelete": "Error al eliminar.",
     "recordCreated": "Registro creado.",
     "changesSaved": "Cambios guardados.",
-    "recordDeleted": "Registro eliminado."
+    "recordDeleted": "Registro eliminado.",
+    "appName": "expenseur"
+  },
+  "auth": {
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta"
+  },
+  "workspace": {
+    "switcherLabel": "Espacio de trabajo",
+    "new": "Nuevo espacio",
+    "namePlaceholder": "Nombre del espacio",
+    "create": "Crear espacio",
+    "creating": "Creando...",
+    "errorCreate": "No se pudo crear el espacio."
+  },
+  "invite": {
+    "title": "Invitación",
+    "joined": "Te uniste a {name}.",
+    "redirecting": "Redirigiendo…",
+    "alreadyAccepted": "Esta invitación ya fue aceptada.",
+    "expired": "Esta invitación ha expirado.",
+    "invalid": "Esta invitación no es válida.",
+    "goHome": "Ir a gastos"
   },
   "transactions": {
     "title": "Gastos",
@@ -108,7 +130,8 @@
     "validationStartDate": "Ingresa una fecha de inicio.",
     "validationEndDate": "La fecha de fin no puede ser anterior a la de inicio.",
     "editLabel": "Etiqueta",
-    "editLimit": "Monto límite"
+    "editLimit": "Monto límite",
+    "placeholderLabel": "ej. Hogar"
   },
   "budgetBar": {
     "loading": "Cargando presupuesto…",
@@ -148,22 +171,23 @@
   },
   "settings": {
     "title": "Configuración",
-    "subtitle": "Administra tu perfil, grupo y preferencias.",
+    "subtitle": "Administra tu perfil, espacio de trabajo y preferencias.",
     "profileSection": "Perfil",
     "noName": "Sin nombre",
     "editProfile": "Editar perfil",
-    "groupSection": "Grupo",
+    "workspaceSection": "Espacio de trabajo",
     "memberDefault": "Miembro",
-    "roleAdmin": "Admin",
-    "roleMember": "Miembro",
+    "owner": "Propietario",
+    "member": "Miembro",
     "inviteTitle": "Invitar miembro",
     "invitePlaceholder": "correo@ejemplo.com",
     "inviteBtn": "Invitar",
     "inviteSending": "Enviando…",
-    "leaveGroup": "Abandonar grupo",
-    "leavingGroup": "Abandonando…",
-    "leaveConfirm": "¿Estás seguro de que quieres abandonar el grupo? Perderás acceso a todos los datos compartidos.",
-    "leaveError": "Error al abandonar el grupo.",
+    "leaveWorkspace": "Abandonar espacio",
+    "leavingWorkspace": "Abandonando…",
+    "leaveConfirm": "¿Abandonar este espacio? Perderás acceso a sus datos compartidos.",
+    "leaveError": "Error al abandonar el espacio.",
+    "cannotLeave": "No puedes abandonar tu único espacio.",
     "dangerZone": "Zona de peligro",
     "deleteAccountDescPrefix": "Eliminar tu cuenta es permanente e irreversible. Escribe",
     "deletePhrase": "eliminar mi cuenta",

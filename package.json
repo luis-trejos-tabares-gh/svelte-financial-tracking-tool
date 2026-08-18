@@ -38,6 +38,9 @@
 		"vite": "^8.0.7"
 	},
 	"dependencies": {
+		"@clerk/localizations": "^4.15.3",
+		"@clerk/themes": "^2.4.57",
+		"resend": "^6.20.0",
 		"svelte-clerk": "^1.1.13",
 		"svelte-i18n": "^4.0.1"
 	}

@@ -29,7 +29,29 @@
     "errorDelete": "Error deleting record.",
     "recordCreated": "Record created.",
     "changesSaved": "Changes saved.",
-    "recordDeleted": "Record deleted."
+    "recordDeleted": "Record deleted.",
+    "appName": "expenseur"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Create account"
+  },
+  "workspace": {
+    "switcherLabel": "Workspace",
+    "new": "New workspace",
+    "namePlaceholder": "Workspace name",
+    "create": "Create workspace",
+    "creating": "Creating...",
+    "errorCreate": "Could not create workspace."
+  },
+  "invite": {
+    "title": "Invitation",
+    "joined": "You joined {name}.",
+    "redirecting": "Redirecting…",
+    "alreadyAccepted": "This invitation was already accepted.",
+    "expired": "This invitation has expired.",
+    "invalid": "This invitation is invalid.",
+    "goHome": "Go to expenses"
   },
   "transactions": {
     "title": "Expenses",
@@ -108,7 +130,8 @@
     "validationStartDate": "Enter a start date.",
     "validationEndDate": "End date cannot be before start date.",
     "editLabel": "Label",
-    "editLimit": "Limit amount"
+    "editLimit": "Limit amount",
+    "placeholderLabel": "e.g. Household"
   },
   "budgetBar": {
     "loading": "Loading budget...",
@@ -148,22 +171,23 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Manage your profile, group, and preferences.",
+    "subtitle": "Manage your profile, workspace, and preferences.",
     "profileSection": "Profile",
     "noName": "No name",
     "editProfile": "Edit profile",
-    "groupSection": "Group",
+    "workspaceSection": "Workspace",
     "memberDefault": "Member",
-    "roleAdmin": "Admin",
-    "roleMember": "Member",
+    "owner": "Owner",
+    "member": "Member",
     "inviteTitle": "Invite member",
     "invitePlaceholder": "email@example.com",
     "inviteBtn": "Invite",
     "inviteSending": "Sending...",
-    "leaveGroup": "Leave group",
-    "leavingGroup": "Leaving...",
-    "leaveConfirm": "Are you sure you want to leave the group? You will lose access to all shared data.",
-    "leaveError": "Error leaving the group.",
+    "leaveWorkspace": "Leave workspace",
+    "leavingWorkspace": "Leaving...",
+    "leaveConfirm": "Leave this workspace? You will lose access to its shared data.",
+    "leaveError": "Error leaving the workspace.",
+    "cannotLeave": "You cannot leave your only workspace.",
     "dangerZone": "Danger zone",
     "deleteAccountDescPrefix": "Deleting your account is permanent and irreversible. Type",
     "deletePhrase": "delete my account",

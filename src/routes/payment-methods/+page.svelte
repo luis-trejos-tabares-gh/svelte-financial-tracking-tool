@@ -10,7 +10,7 @@
   ]);
 </script>
 
-<svelte:head><title>{$_('paymentMethodsPage.title')} · Hello Expenses</title></svelte:head>
+<svelte:head><title>{$_('paymentMethodsPage.title')} · {$_('common.appName')}</title></svelte:head>
 
 <div class="py-8 px-4">
   <div class="mx-auto max-w-3xl">

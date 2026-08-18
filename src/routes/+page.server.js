@@ -1,14 +1,17 @@
 import { getFilteredTransactions, getCurrencies, getPaymentMethods, getCategories, getBudgets, seedDefaults } from '$lib/server/database.js';
+import { getActiveWorkspace } from '$lib/server/workspace.js';
 import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ locals }) {
-	const { orgId } = locals.auth();
-	if (!orgId) redirect(307, '/onboarding');
+export async function load({ locals, cookies }) {
+	const { userId } = locals.auth();
+	if (!userId) redirect(307, '/sign-in');
 
-	await seedDefaults(orgId);
+	const { workspaceId } = await getActiveWorkspace(userId, cookies);
+	if (!workspaceId) redirect(307, '/sign-in');
 
-	// Default to current month
+	await seedDefaults(workspaceId);
+
 	const now      = new Date();
 	const year     = now.getFullYear();
 	const month    = String(now.getMonth() + 1).padStart(2, '0');
@@ -17,11 +20,11 @@ export async function load({ locals }) {
 	const endDate   = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
 
 	const [transactions, currencies, paymentMethods, categories, budgets] = await Promise.all([
-		getFilteredTransactions({ groupId: orgId, startDate, endDate }),
-		getCurrencies(orgId),
-		getPaymentMethods(orgId),
-		getCategories(orgId),
-		getBudgets(orgId),
+		getFilteredTransactions({ groupId: workspaceId, startDate, endDate }),
+		getCurrencies(workspaceId),
+		getPaymentMethods(workspaceId),
+		getCategories(workspaceId),
+		getBudgets(workspaceId),
 	]);
 
 	return {

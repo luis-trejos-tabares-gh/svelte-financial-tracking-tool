@@ -1,13 +1,18 @@
 import { createTransaction, getFilteredTransactions } from '$lib/server/database.js';
+import { requireWorkspace } from '$lib/server/workspace.js';
 import { json } from '@sveltejs/kit';
 
-export const POST = async ({ request, locals }) => {
-	const { orgId } = locals.auth();
-	if (!orgId) return json({ message: 'No active group' }, { status: 403 });
+export const POST = async ({ request, locals, cookies }) => {
+	const ctx = await requireWorkspace(locals, cookies);
+	if (ctx.error) return ctx.error;
 
 	try {
 		const transaction = await request.json();
-		const newTransaction = await createTransaction({ ...transaction, groupId: orgId });
+		const newTransaction = await createTransaction({
+			...transaction,
+			groupId: ctx.workspaceId,
+			createdBy: ctx.userId,
+		});
 		return json({ data: newTransaction }, { status: 201 });
 	} catch (error) {
 		console.error('Error creating transaction:', error);
@@ -15,14 +20,16 @@ export const POST = async ({ request, locals }) => {
 	}
 };
 
-export const GET = async ({ url, locals }) => {
-	const { orgId } = locals.auth();
-	if (!orgId) return json({ message: 'No active group' }, { status: 403 });
+export const GET = async ({ url, locals, cookies }) => {
+	const ctx = await requireWorkspace(locals, cookies);
+	if (ctx.error) return ctx.error;
 
 	const startDate = url.searchParams.get('startDate') ?? undefined;
 	const endDate   = url.searchParams.get('endDate')   ?? undefined;
 	const search    = url.searchParams.get('search')    ?? undefined;
 
-	const transactions = await getFilteredTransactions({ groupId: orgId, startDate, endDate, search });
+	const transactions = await getFilteredTransactions({
+		groupId: ctx.workspaceId, startDate, endDate, search,
+	});
 	return json(transactions);
 };

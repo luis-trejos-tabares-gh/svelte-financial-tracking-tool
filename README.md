@@ -116,8 +116,11 @@ The `netlify.toml` at the project root sets the build command and forces Netlify
 
 Add these in your Netlify site under **Site configuration → Environment variables**:
 
-- `TURSO_DATABASE_URL`
-- `TURSO_AUTH_TOKEN`
+- `DATABASE_URL` / `DATABASE_AUTH_TOKEN` (Turso)
+- `PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`
+- `RESEND_API_KEY` / `RESEND_FROM`
+
+In the Clerk Dashboard, **disable Organizations** (or set membership to optional). expenseur uses app-owned workspaces; Clerk is identity-only.
 
 ---
 

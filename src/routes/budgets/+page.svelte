@@ -196,7 +196,7 @@
   const rangedBudgets  = $derived(budgets.filter(b => b.type === 'ranged'));
 </script>
 
-<svelte:head><title>{$_('budgets.title')} · Hello Expenses</title></svelte:head>
+<svelte:head><title>{$_('budgets.title')} · {$_('common.appName')}</title></svelte:head>
 
 <Snackbar bind:visible={snackbarVisible} message={snackbarMessage} type={snackbarType} />
 
@@ -276,7 +276,7 @@
         <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">{$_('budgets.newRanged')}</h2>
         <div class="mb-4">
           <Label class="mb-1 block text-xs font-medium">{$_('budgets.labelField')}</Label>
-          <Input type="text" bind:value={rLabel} placeholder="ej. Viaje a Panamá" size="sm" />
+          <Input type="text" bind:value={rLabel} placeholder={$_('budgets.placeholderLabel')} size="sm" />
         </div>
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>

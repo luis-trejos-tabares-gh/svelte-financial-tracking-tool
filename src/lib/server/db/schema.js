@@ -1,5 +1,34 @@
 import { integer, sqliteTable, text, real, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
+export const workspace = sqliteTable('workspace', {
+	id:        text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	name:      text('name').notNull(),
+	ownerId:   text('owner_id').notNull(),
+	createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+
+export const workspaceMember = sqliteTable('workspace_member', {
+	id:          text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	workspaceId: text('workspace_id').notNull(),
+	userId:      text('user_id').notNull(),
+	createdAt:   text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+}, (t) => ({
+	uniqueMember: uniqueIndex('workspace_member_unique').on(t.workspaceId, t.userId),
+}));
+
+export const workspaceInvite = sqliteTable('workspace_invite', {
+	id:          text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	workspaceId: text('workspace_id').notNull(),
+	email:       text('email').notNull(),
+	token:       text('token').notNull(),
+	invitedBy:   text('invited_by').notNull(),
+	expiresAt:   text('expires_at').notNull(),
+	acceptedAt:  text('accepted_at'),
+	createdAt:   text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+}, (t) => ({
+	uniqueToken: uniqueIndex('workspace_invite_token_unique').on(t.token),
+}));
+
 export const category = sqliteTable('category', {
 	id:      text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
 	groupId: text('group_id').notNull(),
@@ -20,6 +49,7 @@ export const transaction = sqliteTable('transaction', {
 	paymentMethod: text('payment_method').notNull().default('other'),
 	type:          text('type', { enum: ['expense', 'income'] }).notNull().default('expense'),
 	budgetId:      text('budget_id'),
+	createdBy:     text('created_by'),
 });
 
 export const currency = sqliteTable('currency', {

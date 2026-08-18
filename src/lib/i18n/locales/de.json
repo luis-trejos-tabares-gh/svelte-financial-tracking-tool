@@ -29,7 +29,29 @@
     "errorDelete": "Fehler beim Löschen.",
     "recordCreated": "Eintrag erstellt.",
     "changesSaved": "Änderungen gespeichert.",
-    "recordDeleted": "Eintrag gelöscht."
+    "recordDeleted": "Eintrag gelöscht.",
+    "appName": "expenseur"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Konto erstellen"
+  },
+  "workspace": {
+    "switcherLabel": "Arbeitsbereich",
+    "new": "Neuer Arbeitsbereich",
+    "namePlaceholder": "Name des Arbeitsbereichs",
+    "create": "Arbeitsbereich erstellen",
+    "creating": "Erstellen...",
+    "errorCreate": "Arbeitsbereich konnte nicht erstellt werden."
+  },
+  "invite": {
+    "title": "Einladung",
+    "joined": "Sie sind {name} beigetreten.",
+    "redirecting": "Weiterleitung…",
+    "alreadyAccepted": "Diese Einladung wurde bereits angenommen.",
+    "expired": "Diese Einladung ist abgelaufen.",
+    "invalid": "Diese Einladung ist ungültig.",
+    "goHome": "Zu den Ausgaben"
   },
   "transactions": {
     "title": "Ausgaben",
@@ -108,7 +130,8 @@
     "validationStartDate": "Bitte Startdatum eingeben.",
     "validationEndDate": "Enddatum kann nicht vor dem Startdatum liegen.",
     "editLabel": "Bezeichnung",
-    "editLimit": "Limitbetrag"
+    "editLimit": "Limitbetrag",
+    "placeholderLabel": "z.B. Haushalt"
   },
   "budgetBar": {
     "loading": "Budget wird geladen...",
@@ -148,22 +171,23 @@
   },
   "settings": {
     "title": "Einstellungen",
-    "subtitle": "Verwalten Sie Ihr Profil, Ihre Gruppe und Einstellungen.",
+    "subtitle": "Verwalten Sie Ihr Profil, Ihren Arbeitsbereich und Einstellungen.",
     "profileSection": "Profil",
     "noName": "Kein Name",
     "editProfile": "Profil bearbeiten",
-    "groupSection": "Gruppe",
+    "workspaceSection": "Arbeitsbereich",
     "memberDefault": "Mitglied",
-    "roleAdmin": "Admin",
-    "roleMember": "Mitglied",
+    "owner": "Inhaber",
+    "member": "Mitglied",
     "inviteTitle": "Mitglied einladen",
     "invitePlaceholder": "email@beispiel.de",
     "inviteBtn": "Einladen",
     "inviteSending": "Senden...",
-    "leaveGroup": "Gruppe verlassen",
-    "leavingGroup": "Verlassen...",
-    "leaveConfirm": "Sind Sie sicher, dass Sie die Gruppe verlassen möchten? Sie verlieren den Zugriff auf alle gemeinsam genutzten Daten.",
-    "leaveError": "Fehler beim Verlassen der Gruppe.",
+    "leaveWorkspace": "Arbeitsbereich verlassen",
+    "leavingWorkspace": "Verlassen...",
+    "leaveConfirm": "Diesen Arbeitsbereich verlassen? Sie verlieren den Zugriff auf die gemeinsamen Daten.",
+    "leaveError": "Fehler beim Verlassen des Arbeitsbereichs.",
+    "cannotLeave": "Sie können Ihren einzigen Arbeitsbereich nicht verlassen.",
     "dangerZone": "Gefahrenzone",
     "deleteAccountDescPrefix": "Das Löschen Ihres Kontos ist dauerhaft und unwiderruflich. Geben Sie",
     "deletePhrase": "konto loeschen",
