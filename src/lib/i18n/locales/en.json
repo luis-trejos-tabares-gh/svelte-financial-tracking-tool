@@ -6,6 +6,8 @@
     "currencies": "Currencies",
     "paymentMethods": "Payment Methods",
     "settings": "Settings",
+    "groupTransactions": "Transactions",
+    "groupCatalog": "Catalog",
     "menu": "Menu"
   },
   "common": {
@@ -194,7 +196,18 @@
     "deleteAccountDescSuffix": "to confirm.",
     "deleteBtn": "Delete account",
     "deletingAccount": "Deleting...",
-    "deleteError": "Error deleting account."
+    "deleteError": "Error deleting account.",
+    "inviteSuccess": "Invitation sent.",
+    "inviteError": "Error sending invitation.",
+    "inviteLanguage": "Invitation language"
+  },
+  "email": {
+    "invite": {
+      "subject": "You've been invited to {workspace} on {appName}",
+      "body": "You've been invited to join {workspace} on {appName}.",
+      "cta": "Accept invitation",
+      "copyLink": "Or copy this link:"
+    }
   },
   "onboarding": {
     "title": "Set up your group",

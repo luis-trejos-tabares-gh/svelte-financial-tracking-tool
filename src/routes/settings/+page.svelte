@@ -1,12 +1,14 @@
 <script lang="ts">
   import { useClerkContext } from 'svelte-clerk';
   import { goto, invalidateAll } from '$app/navigation';
-  import { _ } from 'svelte-i18n';
+  import { _, locale } from 'svelte-i18n';
+  import { SUPPORTED_LOCALES, LOCALE_NAMES } from '$lib/i18n';
 
   let { data } = $props();
   const ctx = useClerkContext();
 
   let inviteEmail   = $state('');
+  let inviteLocale  = $state($locale ?? 'es');
   let inviteSending = $state(false);
   let inviteMessage = $state('');
   let inviteError   = $state(false);
@@ -16,21 +18,25 @@
     if (!inviteEmail.trim()) return;
     inviteSending = true;
     inviteMessage = '';
+    inviteError = false;
     inviteUrl = '';
     try {
       const res = await fetch('/settings/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: inviteEmail.trim() }),
+        body: JSON.stringify({ email: inviteEmail.trim(), locale: inviteLocale }),
       });
       const body = await res.json();
-      inviteMessage = body.message;
-      inviteUrl = body.inviteUrl ?? '';
       inviteError = !res.ok;
+      inviteMessage = res.ok ? $_('settings.inviteSuccess') : $_('settings.inviteError');
+      inviteUrl = res.ok ? body.inviteUrl ?? '' : '';
       if (res.ok) inviteEmail = '';
-    } finally {
-      inviteSending = false;
+    } catch {
+      inviteError = true;
+      inviteMessage = $_('settings.inviteError');
+      inviteUrl = '';
     }
+    inviteSending = false;
   }
 
   let leaving = $state(false);
@@ -166,11 +172,21 @@
             {inviteSending ? $_('settings.inviteSending') : $_('settings.inviteBtn')}
           </button>
         </div>
+        <label class="mt-3 flex flex-col gap-1.5 sm:flex-row sm:items-center">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">{$_('settings.inviteLanguage')}</span>
+          <select
+            bind:value={inviteLocale}
+            class="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700
+                   text-slate-800 dark:text-white text-sm px-3 py-2 outline-none
+                   focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:w-48"
+          >
+            {#each SUPPORTED_LOCALES as code}
+              <option value={code}>{LOCALE_NAMES[code]}</option>
+            {/each}
+          </select>
+        </label>
         {#if inviteMessage}
-          <p class="mt-1.5 text-xs {inviteError ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-400'}">{inviteMessage}</p>
-        {/if}
-        {#if inviteUrl}
-          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 break-all">{inviteUrl}</p>
+          <p class="mt-4 text-sm {inviteError ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-400'}">{inviteMessage}</p>
         {/if}
       </div>
 

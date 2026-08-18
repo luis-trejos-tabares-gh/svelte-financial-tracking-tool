@@ -10,6 +10,7 @@ import {
 
 export const SUPPORTED_LOCALES = ['en', 'es', 'pt', 'de'];
 export const LOCALE_LABELS     = { en: 'EN', es: 'ES', pt: 'PT', de: 'DE' };
+export const LOCALE_NAMES      = { en: 'English', es: 'Español', pt: 'Português', de: 'Deutsch' };
 
 /** Maps app locale code → BCP-47 tag used for Intl date/number formatting */
 export const FORMAT_LOCALE = {

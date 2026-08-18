@@ -43,13 +43,28 @@
 		if (browser && $locale) document.documentElement.lang = $locale;
 	});
 
-	const navItems = [
-		{ href: '/',                icon: ReceiptOutline,    labelKey: 'nav.expenses'      },
-		{ href: '/budgets',         icon: WalletOutline,     labelKey: 'nav.budgets'       },
-		{ href: '/categories',      icon: TagOutline,        labelKey: 'nav.categories'    },
-		{ href: '/currencies',      icon: DollarOutline,     labelKey: 'nav.currencies'    },
-		{ href: '/payment-methods', icon: CreditCardOutline, labelKey: 'nav.paymentMethods'},
-		{ href: '/settings',        icon: CogOutline,        labelKey: 'nav.settings'      },
+	const navGroups = [
+		{
+			labelKey: 'nav.groupTransactions',
+			items: [
+				{ href: '/',        icon: ReceiptOutline, labelKey: 'nav.expenses' },
+				{ href: '/budgets', icon: WalletOutline,  labelKey: 'nav.budgets'  },
+			],
+		},
+		{
+			labelKey: 'nav.groupCatalog',
+			items: [
+				{ href: '/categories',      icon: TagOutline,        labelKey: 'nav.categories'     },
+				{ href: '/currencies',      icon: DollarOutline,     labelKey: 'nav.currencies'     },
+				{ href: '/payment-methods', icon: CreditCardOutline, labelKey: 'nav.paymentMethods' },
+			],
+		},
+		{
+			labelKey: undefined,
+			items: [
+				{ href: '/settings',      icon: CogOutline,        labelKey: 'nav.settings'     },
+			],
+		},
 	];
 
 	let sidebarOpen = $state(false);
@@ -137,25 +152,41 @@
 				/>
 			</div>
 
-			<nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
-				{#each navItems as item}
-					{@const active = $page.url.pathname === item.href}
-					<a
-						href={item.href}
-						onclick={() => sidebarOpen = false}
-						class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors
-						  {active
-						    ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-						    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-gray-800'}"
-					>
-						<svelte:component this={item.icon} class="w-4 h-4 shrink-0" />
-						{$_(item.labelKey)}
-						{#if active}
-							<span class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+			<nav class="flex-1 overflow-y-auto py-4 px-3 flex flex-col">
+				{#each navGroups as group, i}
+					<div class="mt-1">
+						{#if group.labelKey}
+						<p class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+							{$_(group.labelKey)}
+						</p>
 						{/if}
-					</a>
+						<div class="space-y-0.5">
+							{#each group.items as item}
+								{@render navLink(item)}
+							{/each}
+						</div>
+					</div>
 				{/each}
 			</nav>
+
+			{#snippet navLink(item)}
+				{@const active = $page.url.pathname === item.href}
+				{@const Icon = item.icon}
+				<a
+					href={item.href}
+					onclick={() => sidebarOpen = false}
+					class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors
+					  {active
+					    ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+					    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-gray-800'}"
+				>
+					<Icon class="w-4 h-4 shrink-0" />
+					{#if item.labelKey}{$_(item.labelKey)}{/if}
+					{#if active}
+						<span class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+					{/if}
+				</a>
+			{/snippet}
 
 			<div class="px-3 pb-4">
 				<div class="text-xs text-slate-400 dark:text-slate-600 text-center">v0.1.0</div>

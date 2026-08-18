@@ -8,7 +8,7 @@ export const POST = async ({ request, locals, cookies }) => {
 	const ctx = await requireWorkspace(locals, cookies);
 	if (ctx.error) return ctx.error;
 
-	const { email } = await request.json();
+	const { email, locale } = await request.json();
 	if (!email) return json({ message: 'email is required' }, { status: 400 });
 
 	const token = crypto.randomUUID();
@@ -29,6 +29,7 @@ export const POST = async ({ request, locals, cookies }) => {
 		to: email.trim(),
 		inviteUrl,
 		workspaceName: workspace?.name ?? 'expenseur',
+		locale,
 	});
 
 	if (!sent) {

@@ -6,6 +6,8 @@
     "currencies": "Währungen",
     "paymentMethods": "Zahlungsmethoden",
     "settings": "Einstellungen",
+    "groupTransactions": "Übersicht",
+    "groupCatalog": "Katalog",
     "menu": "Menü"
   },
   "common": {
@@ -194,7 +196,18 @@
     "deleteAccountDescSuffix": "zur Bestätigung ein.",
     "deleteBtn": "Konto löschen",
     "deletingAccount": "Löschen...",
-    "deleteError": "Fehler beim Löschen des Kontos."
+    "deleteError": "Fehler beim Löschen des Kontos.",
+    "inviteSuccess": "Einladung gesendet.",
+    "inviteError": "Fehler beim Senden der Einladung.",
+    "inviteLanguage": "Sprache der Einladung"
+  },
+  "email": {
+    "invite": {
+      "subject": "Sie wurden zu {workspace} auf {appName} eingeladen",
+      "body": "Sie wurden eingeladen, {workspace} auf {appName} beizutreten.",
+      "cta": "Einladung annehmen",
+      "copyLink": "Oder kopieren Sie diesen Link:"
+    }
   },
   "onboarding": {
     "title": "Gruppe einrichten",

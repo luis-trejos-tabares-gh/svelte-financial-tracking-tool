@@ -6,6 +6,8 @@
     "currencies": "Moedas",
     "paymentMethods": "Métodos de Pagamento",
     "settings": "Configurações",
+    "groupTransactions": "Acompanhamento",
+    "groupCatalog": "Catálogo",
     "menu": "Menu"
   },
   "common": {
@@ -194,7 +196,18 @@
     "deleteAccountDescSuffix": "para confirmar.",
     "deleteBtn": "Excluir conta",
     "deletingAccount": "Excluindo...",
-    "deleteError": "Erro ao excluir a conta."
+    "deleteError": "Erro ao excluir a conta.",
+    "inviteSuccess": "Convite enviado.",
+    "inviteError": "Erro ao enviar o convite.",
+    "inviteLanguage": "Idioma do convite"
+  },
+  "email": {
+    "invite": {
+      "subject": "Você foi convidado para {workspace} no {appName}",
+      "body": "Você foi convidado para entrar em {workspace} no {appName}.",
+      "cta": "Aceitar convite",
+      "copyLink": "Ou copie este link:"
+    }
   },
   "onboarding": {
     "title": "Configure seu grupo",
