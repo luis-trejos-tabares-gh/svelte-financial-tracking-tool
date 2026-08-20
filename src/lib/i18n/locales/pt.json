@@ -48,6 +48,8 @@
   },
   "invite": {
     "title": "Convite",
+    "needAuthTitle": "Você foi convidado para {name}",
+    "needAuthSubtitle": "Crie uma conta para entrar neste espaço.",
     "joined": "Você entrou em {name}.",
     "redirecting": "Redirecionando…",
     "alreadyAccepted": "Este convite já foi aceito.",

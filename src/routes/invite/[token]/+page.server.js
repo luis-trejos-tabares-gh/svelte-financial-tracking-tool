@@ -1,4 +1,3 @@
-import { redirect } from '@sveltejs/kit';
 import {
 	getInviteByToken,
 	markInviteAccepted,
@@ -11,24 +10,31 @@ import { setActiveWorkspaceCookie } from '$lib/server/workspace.js';
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params, locals, cookies }) {
 	const { userId } = locals.auth();
-	if (!userId) {
-		redirect(307, `/sign-in?redirect_url=${encodeURIComponent(`/invite/${params.token}`)}`);
-	}
-
 	const invite = await getInviteByToken(params.token);
+
 	if (!invite) {
 		return { status: 'invalid' };
-	}
-	if (invite.acceptedAt) {
-		return { status: 'accepted' };
-	}
-	if (new Date(invite.expiresAt) < new Date()) {
-		return { status: 'expired' };
 	}
 
 	const workspace = await getWorkspaceById(invite.workspaceId);
 	if (!workspace) {
 		return { status: 'invalid' };
+	}
+
+	if (invite.acceptedAt) {
+		return { status: 'accepted', workspaceName: workspace.name };
+	}
+	if (new Date(invite.expiresAt) < new Date()) {
+		return { status: 'expired', workspaceName: workspace.name };
+	}
+
+	if (!userId) {
+		return {
+			status: 'need_auth',
+			workspaceName: workspace.name,
+			email: invite.email ?? '',
+			token: params.token,
+		};
 	}
 
 	if (!(await isWorkspaceMember(invite.workspaceId, userId))) {

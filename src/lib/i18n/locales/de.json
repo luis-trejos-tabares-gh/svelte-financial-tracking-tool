@@ -48,6 +48,8 @@
   },
   "invite": {
     "title": "Einladung",
+    "needAuthTitle": "Sie wurden zu {name} eingeladen",
+    "needAuthSubtitle": "Erstellen Sie ein Konto, um diesem Arbeitsbereich beizutreten.",
     "joined": "Sie sind {name} beigetreten.",
     "redirecting": "Weiterleitung…",
     "alreadyAccepted": "Diese Einladung wurde bereits angenommen.",

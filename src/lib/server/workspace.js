@@ -123,12 +123,14 @@ export function setActiveWorkspaceCookie(cookies, workspaceId) {
 }
 
 /**
- * Layout bootstrap: import legacy Clerk-org rows, guarantee a personal
- * workspace, resolve the active workspace from the cookie.
+ * Layout bootstrap: import legacy Clerk-org rows, optionally guarantee a
+ * personal workspace, then resolve the active workspace from the cookie.
+ * Skip createPersonal on /invite so invitees join the invited workspace
+ * instead of getting an auto-created personal one.
  */
-export async function bootstrapWorkspaces(userId, cookies, orgId) {
+export async function bootstrapWorkspaces(userId, cookies, orgId, { createPersonal = true } = {}) {
 	await importLegacyGroups(userId, orgId);
-	await ensurePersonalWorkspace(userId);
+	if (createPersonal) await ensurePersonalWorkspace(userId);
 	return getActiveWorkspace(userId, cookies);
 }
 

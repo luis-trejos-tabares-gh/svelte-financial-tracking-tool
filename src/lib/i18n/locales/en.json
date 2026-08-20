@@ -48,6 +48,8 @@
   },
   "invite": {
     "title": "Invitation",
+    "needAuthTitle": "You've been invited to {name}",
+    "needAuthSubtitle": "Create an account to join this workspace.",
     "joined": "You joined {name}.",
     "redirecting": "Redirecting…",
     "alreadyAccepted": "This invitation was already accepted.",
